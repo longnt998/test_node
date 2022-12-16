@@ -1,6 +1,7 @@
 const multer = require('multer');
 const formData = multer();
 const { Router } = require('express')
+const Authenticate = require('../middleware/authenticate');
 const MessageController = require('../controllers/MessageController')
 
 class apiRoute {
@@ -19,6 +20,7 @@ class apiRoute {
         { name: 'gif', maxCount: 1 },
         { name: 'room_id', maxCount: 1 },
       ]),
+      Authenticate.authenticateRoom,
       this.controller.sendMessage
     );
   }

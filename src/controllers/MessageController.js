@@ -8,11 +8,14 @@ class MessageController {
   }
 
   async sendMessage(req, res) {
-    // req.body.from_user_id = req.user.id;
-
+    console.log(req);
+    // // req.body.from_user_id = req.user.id;
+    // req.body.from_user_id = 1;
+    return
     await MessageService.create(req)
       .then(async data => {
         const roomInfo = await MessageService.getInfoRoom(req.room.id, req.user.id);
+        console.log(roomInfo);
 
         socketManager.emit(`room.${data.room_id}:message.created`, data);
         socketManager.emit (`room.${data.room_id}:new-message`, roomInfo.data);
@@ -21,7 +24,7 @@ class MessageController {
       })
       .catch(error => {
         console.log(error);
-        logger.error(error);
+        // logger.error(error);
 
         return res.status(403).json({ error: error });
       });
