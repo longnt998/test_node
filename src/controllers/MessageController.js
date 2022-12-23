@@ -1,35 +1,27 @@
 const MessageService = require('../services/MessageService')
+const socketManager = require('../listeners/socketManager');
 
 class MessageController {
-  async getAllMessage(req, res) {
-    let m = await MessageService.findAll()
-
-    return res.json(m)
-  }
-
   async sendMessage(req, res) {
-    console.log(req);
-    // // req.body.from_user_id = req.user.id;
-    // req.body.from_user_id = 1;
-    return
-    await MessageService.create(req)
-      .then(async data => {
-        const roomInfo = await MessageService.getInfoRoom(req.room.id, req.user.id);
-        console.log(roomInfo);
+    let data = await MessageService.createNewMessage(req, req.user.id)
+    let roomInfo = await MessageService.getInfoRoom(req.room_id, req.user.id)
+    socketManager.emitSendMessage(data, roomInfo)
 
-        socketManager.emit(`room.${data.room_id}:message.created`, data);
-        socketManager.emit (`room.${data.room_id}:new-message`, roomInfo.data);
-
-        return res.status(200).json({ data: data });
-      })
-      .catch(error => {
-        console.log(error);
-        // logger.error(error);
-
-        return res.status(403).json({ error: error });
-      });
+    return res.json(roomInfo)
   }
 
+  async readMessage(req, res) {
+    let lastMsgId = await MessageService.readMessage(req.room_id, req.user.id)
+    let data = {
+      last_message_id: lastMsgId,
+      room_id: req.room_id,
+      user: req.user
+    }
+
+    socketManager.emitReadMessage(data, req.user.id)
+
+    return res.json(true)
+  }
 }
 
 module.exports = new MessageController

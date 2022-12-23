@@ -1,8 +1,8 @@
 const multer = require('multer');
 const formData = multer();
 const { Router } = require('express')
-const Authenticate = require('../middleware/authenticate');
 const MessageController = require('../controllers/MessageController')
+const { authenticateRoom } = require('../middleware/authenticate');
 
 class apiRoute {
   constructor() {
@@ -12,16 +12,18 @@ class apiRoute {
   }
 
   registerRoutes() {
-    this.router.get('/hello', this.controller.getAllMessage),
     this.router.post(
       '/message/send',
-      formData.fields([
-        { name: 'content', maxCount: 1 },
-        { name: 'gif', maxCount: 1 },
-        { name: 'room_id', maxCount: 1 },
-      ]),
-      Authenticate.authenticateRoom,
+      formData.single('content'),
+      authenticateRoom,
       this.controller.sendMessage
+    );
+
+    this.router.post(
+      '/message/read',
+      formData.none(),
+      authenticateRoom,
+      this.controller.readMessage
     );
   }
 }

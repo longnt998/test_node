@@ -1,4 +1,4 @@
-const origin = process.env.ORIGIN;
+const origin = process.env.ALLOW_ORIGIN;
 
 const corsOptions = {
   origin: origin || '*',

@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const axios = require('axios');
 const { LARAVEL_URL } = process.env;
-const { Room } = require('../models/index');
+const { RoomUser } = require('../models/index');
 
 class Authenticate {
   async authenticateUser(req, res, next) {
@@ -20,21 +20,15 @@ class Authenticate {
         Authorization: authorization,
       },
     };
-    console.log(123);
-    return
 
     await axios
       .get(url, options)
       .then((response) => {
-        console.log("response", response)
-        return
         req.user = response.data.data;
 
         return next();
       })
       .catch((error) => {
-        logger.error(error);
-
         return res.status(401).json({
           error: 'Permission denied.',
         });
@@ -42,16 +36,16 @@ class Authenticate {
   }
 
   async authenticateRoom(req, res, next) {
-    await Room.checkAuthorization(req).then((room) => {
-      if (!room) {
-        return res.status(403).json({
-          error: 'You are not authorized to send message to this room.',
-        });
-      } else {
-        req.room = room;
+    const auth = await RoomUser.checkAuthenticate(req.body?.room_id, req.user.id)
 
-        return next();
-      }
+    if (auth) {
+      req.room_id = req.body.room_id
+
+      return next()
+    }
+
+    return res.status(401).json({
+      error: 'Permission denied.',
     });
   }
 }
