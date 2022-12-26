@@ -26,9 +26,9 @@ class Message extends Model {
       where: {
         [Op.and]: {
           room_id: roomId,
-          from_user_id: {
-            [Op.ne]: userId
-          }
+          // from_user_id: {
+          //   [Op.ne]: userId
+          // }
         }
       },
       order: [['id', 'desc']],

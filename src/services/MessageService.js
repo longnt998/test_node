@@ -46,12 +46,6 @@ class MessageService {
 
   async getInfoRoom(roomId, userId) {
     let room = await this.getRoom(roomId);
-    let unreadMsg = await RoomUser.getUnreadMessage(roomId, userId);
-    let totalMsg = await Message.countMessageByRoom(
-      roomId,
-      unreadMsg.last_message_id,
-      userId
-    );
 
     return {
       id: room.id,
@@ -62,8 +56,17 @@ class MessageService {
         created_at: room.messages[0].created_at,
         updated_at: room.messages[0].updated_at,
       },
-      total_unread_message: totalMsg,
     };
+  }
+
+  async getCountUnReadMessage(roomId, userId) {
+    let unreadMsg = await RoomUser.getUnreadMessage(roomId, userId);
+
+    return Message.countMessageByRoom(
+      roomId,
+      unreadMsg.last_message_id,
+      userId
+    );
   }
 
   async createFormattedMessage(messageId, mediaUrl = null) {

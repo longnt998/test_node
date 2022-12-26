@@ -22,6 +22,11 @@ class MessageController {
 
     return res.json(true)
   }
+
+  async countUnread(req, res) {
+    let count = await MessageService.getCountUnReadMessage(req.room_id, req.user.id)
+    return res.json(count);
+  }
 }
 
 module.exports = new MessageController

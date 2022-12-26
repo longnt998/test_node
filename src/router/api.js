@@ -25,6 +25,13 @@ class apiRoute {
       authenticateRoom,
       this.controller.readMessage
     );
+
+    this.router.post(
+      '/message/countUnread',
+      formData.none(),
+      authenticateRoom,
+      this.controller.countUnread
+    )
   }
 }
 
