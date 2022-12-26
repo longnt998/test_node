@@ -1,7 +1,42 @@
-const { DataTypes, Model } = require('sequelize');
+const { DataTypes, Model, Op } = require('sequelize');
 const { connectToDatabase: sequelize } = require('../config');
 
-class Message extends Model {}
+class Message extends Model {
+  static async countMessageByRoom(roomId, lastMsgId, userId) {
+    let count = await this.count({
+      where: {
+        [Op.and]: {
+          room_id: roomId,
+          id: {
+            [Op.gt]: lastMsgId
+          },
+          from_user_id: {
+            [Op.ne]: userId
+          }
+        }
+      }
+    })
+
+    return count
+  }
+
+  static async lastMessageByRoom(roomId, userId) {
+    let msg = await this.findOne({
+      attributes: ['id'],
+      where: {
+        [Op.and]: {
+          room_id: roomId,
+          // from_user_id: {
+          //   [Op.ne]: userId
+          // }
+        }
+      },
+      order: [['id', 'desc']],
+    })
+
+    return msg
+  }
+}
 
 Message.init(
   {

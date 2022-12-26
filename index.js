@@ -5,7 +5,6 @@ const cors = require('cors');
 const express = require('express');
 const socketio = require('socket.io');
 const router = require('./src/router');
-const flash = require('connect-flash');
 const { createServer } = require('http');
 const { corsOptions, connectRedis } = require('./src/config');
 
@@ -26,8 +25,6 @@ class Server {
     // config body parse using express
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-
-    this.app.use(flash());
     this.app.use(express.static(path.join(__dirname, 'public')));
 
     // add route
